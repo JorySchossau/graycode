@@ -30,15 +30,16 @@
 // Example:
 
 #pragma once
+#include <cmath>
 
 namespace Graycode {
 
 	namespace priv {
-		int getHighestBitPosition(unsigned x) {
+		unsigned int getHighestBitPosition(unsigned int x) {
 			// modified from Hacker's Delight: /* Julius Goryavsky's version of Harley's algorithm.  // 17 elementary ops plus an indexed load, if the machine // has "and not." */
 			// Returns -1 if there is no highest bit
-			const char u = 99;
-			static char table[64] =
+			const volatile char u = 99;
+			static volatile char table[64] =
 			{32,31, u,16, u,30, 3, u,  15, u, u, u,29,10, 2, u,
 				u, u,12,14,21, u,19, u,   u,28, u,25, u, 9, 1, u,
 				17, u, 4, u, u, u,11, u,  13,22,20, u,26, u, u,18,
@@ -52,6 +53,11 @@ namespace Graycode {
 			x = x*0x06EB14F9;    // Multiplier is 7*255**3.
 			return 32 - table[x >> 26] - 1;
 		}
+        static inline unsigned int graycode_int(unsigned int& x) {
+            unsigned int r;
+            r = x ^ (x>>1);
+            return r;
+        }
 	}
 
 	// Broken for some reason
@@ -71,22 +77,32 @@ namespace Graycode {
 	//	T* result = reinterpret_cast<T*>(r);
 	//	return result;
 	//}
-	template<class T>
-	static T& ungraycode(T x) {
-		unsigned int* n = reinterpret_cast<unsigned int*>(&x);
-		unsigned int* r = new unsigned int;
-		unsigned short highPosition = priv::getHighestBitPosition(*n);
-		if (highPosition < 0) {
-			*r = 0;
-			return *reinterpret_cast<T*>(r);
-		}
-		*r |= *n & (1<<highPosition);
-		for (int i=highPosition-1; i>=0; --i) {
-			(*r) |= (((*r)>>1) ^ *n) & (1<<i);
-		}
-		T* result = reinterpret_cast<T*>(r);
-		return *result;
-	}
+	//template<class T>
+	//static T& ungraycode(T x) {
+	//	unsigned int* n = reinterpret_cast<unsigned int*>(&x);
+	//	unsigned int* r = new unsigned int;
+	//	unsigned short highPosition = priv::getHighestBitPosition(*n);
+	//	if (highPosition < 0) {
+	//		*r = 0;
+	//		return *reinterpret_cast<T*>(r);
+	//	}
+	//	*r |= *n & (1<<highPosition);
+	//	for (int i=highPosition-1; i>=0; --i) {
+	//		(*r) |= (((*r)>>1) ^ *n) & (1<<i);
+	//	}
+	//	T* result = reinterpret_cast<T*>(r);
+	//	return *result;
+	//}
+    static unsigned int ungraycode(const unsigned int& x) {
+        unsigned short highPosition = priv::getHighestBitPosition(x);
+        if (highPosition < 0) return 0;
+        unsigned int r;
+        r |= x & (1<<highPosition);
+        for (int i=highPosition-1; i>=0; --i) {
+            r |= ((r>>1) ^ x) & (1<<i);
+        }
+        return r;
+    }
 
 	// Broken for some reason
 	//template<class T>
@@ -97,13 +113,31 @@ namespace Graycode {
 	//	T* result = reinterpret_cast<T*>(r);
 	//	return result;
 	//}
-	template<class T>
-	static T& graycode(T x) {
-		unsigned int* n = reinterpret_cast<unsigned int*>(&x);
-		unsigned int* r = new unsigned int;
-		(*r) = (*n) ^ ((*n)>>1);
-		T* result = reinterpret_cast<T*>(r);
-		return *result;
-	}
+    template<class T>
+    static unsigned int graycode(const T& x) {
+        bool neg=(x<0);
+        unsigned int n = std::abs(x);
+        if (neg)
+            return priv::graycode_int(n)*-1;
+        else
+            return priv::graycode_int(n);
+    }
+	//static char graycode(char& x) {
+    //    //bool neg=false;
+    //    //neg = (x < 0);
+    //    //if (neg) result *= -1;
+    //    //n = abs(n);
+	//	return priv::graycode_int(x);
+	//}
+	//static int graycode(int& x) {
+    //    bool neg=false;
+    //    neg = (x < 0);
+    //    unsigned int n = std::abs(x);
+    //    if (neg) result *= -1;
+    //    //n = abs(n);
+    //    unsigned int n(x),r;
+	//	r = n ^ (n>>1);
+	//	return r;
+	//}
 }
 
