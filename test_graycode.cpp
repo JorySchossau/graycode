@@ -14,31 +14,22 @@ TEST(getHighestBitPosition, GetHighestBitSetPosition) {
 	EXPECT_EQ(priv::getHighestBitPosition(8), 3) << "int(8) or bit 4 should yield '3'";
 }
 
-TEST(ungraycode, ConvertIntToGraycode) {
+TEST(ungraycode, ConvertGraycodeToInt) {
 	// ungraycode
-	int n;
-	n = 0; EXPECT_EQ(ungraycode(n), 0) << "ungraycode(" << n << ") should be 0";
-	n = 3; EXPECT_EQ(ungraycode(n), 2) << "ungraycode(" << n << ") should be 2";
-	n = 5; EXPECT_EQ(ungraycode(n), 6) << "ungraycode(" << n << ") should be 6";
+	unsigned int n;
+	n = 0; EXPECT_EQ(ungraycode(n), 0) << "ungraycode(" << n << ") should be 0"; /// THIS LINE CANNOT BE FIRST ?!?!
+	n = 2; EXPECT_EQ(ungraycode(n), 3) << "ungraycode(" << n << ") should be 3";
+	n = 4; EXPECT_EQ(ungraycode(n), 7) << "ungraycode(" << n << ") should be 7";
 	n = 7; EXPECT_EQ(ungraycode(n), 5) << "ungraycode(" << n << ") should be 5";
 }
 
 TEST(graycode, ConvertIntToGraycode) {
 	// graycode
-	int n;
+	unsigned int n;
 	n = 0; EXPECT_EQ(graycode(n), 0) << "graycode(" << n << ") should be 0";
 	n = 3; EXPECT_EQ(graycode(n), 2) << "graycode(" << n << ") should be 2";
 	n = 7; EXPECT_EQ(graycode(n), 4) << "graycode(" << n << ") should be 4";
 	n = 5; EXPECT_EQ(graycode(n), 7) << "graycode(" << n << ") should be 7";
-}
-
-TEST(reversibility, GraycodeAndUngraycode) {
-	// full reversibility
-	int n;
-	n = 0; EXPECT_EQ(ungraycode(graycode(n)), 0) << "ungraycode(graycode(" << n << ")) should be 0";
-	n = 3; EXPECT_EQ(ungraycode(graycode(n)), 3) << "ungraycode(graycode(" << n << ")) should be 3";
-	n = 5; EXPECT_EQ(ungraycode(graycode(n)), 5) << "ungraycode(graycode(" << n << ")) should be 5";
-	n = 7; EXPECT_EQ(ungraycode(graycode(n)), 7) << "ungraycode(graycode(" << n << ")) should be 7";
 }
 
 TEST(character, GraycodeOfChar) {
